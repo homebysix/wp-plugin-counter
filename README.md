@@ -5,6 +5,15 @@ This script counts how many WordPress plugins your site has, compares the count 
 
 This script works best when triggered hourly by cron.
 
+#### Features
+
+- Email notifications tell you whether the plugin count has changed.
+- Filter-friendly subject line lets you keep an email record of changes.
+- Integration with git, for inclusion of file-level changes in the email notifications.
+- If the plugin count has changed, you can be notified by SMS message.
+- Since the plugin counter is not a WordPress plugin itself, it's less susceptible to tampering.
+- Relatively easy to configure on web hosts that support custom cron entries.
+
 #### Instructions
 
 1. Edit the options in the SETTINGS section to suit your environment.
