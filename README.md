@@ -19,9 +19,9 @@ This script works best when triggered hourly by cron.
 1. Edit the options in the SETTINGS section to suit your environment.
 2. Place the script in your web hosting "home" folder.
 3. Add the script to your host's cron tab. If you want it to check hourly, for example, the crontab might look like this:
-    ```
-    0 * * * * /bin/sh /home3/pretendco/wp_plugin_counter.sh
-    ```
+```
+0 * * * * /bin/sh /home3/pretendco/wp_plugin_counter.sh
+```
 
 The first time the script runs, you'll get a notification that the plugin count has changed. (This is also an excellent opportunity to test whether the SMS alerts are working, if you configured that option.)
 
