@@ -5,33 +5,50 @@
 #            Name:  wp_plugin_counter.sh
 #     Description:  This script counts how many WordPress plugins your site has,
 #                   compares the count to the last known count, and notifies you
-#                   of the results. This script works best when triggered hourly
-#                   by cron.
-#                       - Ability to include git status in email summary.
-#                       - Ability to send SMS alert upon plugin count change.
+#                   if the count doesn't match. This script works best when
+#                   triggered hourly by cron.
 #          Author:  Elliot Jordan <elliot@elliotjordan.com>
 #         Created:  2014-11-20
-#   Last Modified:  2014-11-24
-#         Version:  1.0
+#   Last Modified:  2014-11-25
+#         Version:  1.0.1-beta
 #
 ###
 
 ################################### SETTINGS ###################################
 
+# The URL of your website.
+# No https:// and no trailing slash.
 WEBSITE_URL="www.pretendco.com"
-WEBSITE_ROOT="/home3/pretendco/public_html" # no trailing slash
-PLUGIN_DIR="wp-content/plugins" # no leading or trailing slash
+
+# The full path to the root dir of your website.
+# No trailing slash.
+WEBSITE_ROOT="/home3/pretendco/public_html"
+
+# The relative path from $WEBSITE_ROOT to your WP plugins dir.
+# No leading or trailing slash.
+PLUGIN_DIR="wp-content/plugins"
+
+# The full path to the file you'd like to save log output to.
+# I recommend NOT saving this log file inside your $WEBSITE_ROOT dir.
 LOG_FILE="/home3/pretendco/wp_plugin_counter.log"
 
+# Set to true if you'd like to see `git status` output in notifications.
+# Your $WEBSITE_ROOT must be a git repo in order for this to work.
 INCLUDE_GIT_STATUS=false
+
+# Set to true if you'd like to receive alerts via SMS upon plugin count change.
 SEND_SMS_ALERT_ON_CHANGE=false
-SEND_ALERTS_WHEN_COUNT_UNCHANGED=false
+# If the above is true, specify your phone's email-to-txt address here.
+SMS_RECIPIENT="0005551212@txt.att.net"
 
 EMAIL_TO="you@pretendco.com"
-SMS_RECIPIENT="0005551212@txt.att.net"
 EMAIL_FROM="$(echo $(whoami)@$(hostname))"
 
-################################################################################
+# Set to true if you'd like to receive an email regardless of the plugin count.
+SEND_ALERTS_WHEN_COUNT_UNCHANGED=false
+
+
+######################### DO NOT EDIT BELOW THIS LINE ##########################
 
 # Get last plugin count and timestamp.
 LAST_PLUGIN_COUNT="$(tail -n 1 "$LOG_FILE" | awk -F' : | plugins.' {'print $2'})"
