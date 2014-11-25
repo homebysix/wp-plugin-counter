@@ -50,6 +50,7 @@ SEND_ALERTS_WHEN_COUNT_UNCHANGED=false
 
 ######################### DO NOT EDIT BELOW THIS LINE ##########################
 
+
 # Get last plugin count and timestamp.
 LAST_PLUGIN_COUNT="$(tail -n 1 "$LOG_FILE" | awk -F' : | plugins.' {'print $2'})"
 LAST_CHECK_DATE="$(tail -n 1 "$LOG_FILE" | awk -F' : ' {'print $1'})"
@@ -58,62 +59,62 @@ LAST_CHECK_DATE="$(tail -n 1 "$LOG_FILE" | awk -F' : ' {'print $1'})"
 CURRENT_PLUGIN_COUNT="$(ls -l /"$WEBSITE_ROOT/$PLUGIN_DIR/" | grep -v " ./" | grep -v " ../" | grep -v "total " | grep -v " index.php" | wc -l)"
 CURRENT_CHECK_DATE="$(date)"
 
-CHANGE_STATUS=false
-EMAIL_SUBJ=""
-EMAIL_MSG=""
+# Compare current count to last count and return result
+if [[ "$LAST_PLUGIN_COUNT" != "$CURRENT_PLUGIN_COUNT" ]]; then
+    HAS_COUNT_CHANGED=true
+else
+    HAS_COUNT_CHANGED=false
+fi
 
-# Write new plugin count and timestamp.
+# Write a new count and timestamp to the logs.
 echo "$CURRENT_CHECK_DATE : $CURRENT_PLUGIN_COUNT plugins." >> $LOG_FILE
 
-# Compare last count to current count, and set email message accordingly.
-if [[ "$LAST_PLUGIN_COUNT" != "$CURRENT_PLUGIN_COUNT" ]]; then
+# If the count has changed, send an email.
+if [[ $HAS_COUNT_CHANGED == true ]]; then
 
-    CHANGE_STATUS=true
+    if [[ $SEND_SMS_ALERT_ON_CHANGE == true && $SMS_RECIPIENT != "0005551212@txt.att.net" ]]; then
 
-    if [[ $SEND_SMS_ALERT_ON_CHANGE == true ]]; then
-
-        # Only send SMS if a change has been detected, and if the SMS setting above is true
         SMS_MESSAGE="Plugin alert for $WEBSITE_URL. Details sent to $EMAIL_TO.\n.\n"
         printf "$SMS_MESSAGE" | /usr/sbin/sendmail "$SMS_RECIPIENT"
-
+        
     fi
 
-elif [[ $SEND_ALERTS_WHEN_COUNT_UNCHANGED == false ]]; then
+    EMAIL_SUBJ="[$WEBSITE_URL] WordPress plugin count change detected"
+    EMAIL_MSG="WARNING: The number of WordPress plugins on $WEBSITE_URL has changed since our last check:\n\n"
+    # Include last two lines from the log.
+    EMAIL_MSG+="$(tail -n 2 "$LOG_FILE")\n\n"
+    # Include git status, if that option is enabled.
+    if [[ $INCLUDE_GIT_STATUS == true ]]; then
+        GIT_STATUS="$(cd "$WEBSITE_ROOT"; git status)"
+        EMAIL_MSG+="Here are the file-level changes, as reported by Git:\n\n$GIT_STATUS\n\n"
+    fi
+    EMAIL_MSG+="Thank you."
 
-    # If alerts are not needed, we can stop here.
-    exit 0
+    # Construct the message
+    SENDMAIL="From: $EMAIL_FROM\nTo: $EMAIL_TO\nSubject: $EMAIL_SUBJ\n$EMAIL_MSG\n.\n"
+
+    # Send the message
+    printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
+
+elif [[ $SEND_ALERTS_WHEN_COUNT_UNCHANGED == true ]]; then
+
+    EMAIL_SUBJ="[$WEBSITE_URL] WordPress plugin count verified"
+    EMAIL_MSG="WARNING: The number of WordPress plugins on $WEBSITE_URL has not changed since our last check:\n\n"
+    # Include last line from the log.
+    EMAIL_MSG+="$(tail -n 1 "$LOG_FILE")\n\n"
+    # Include git status, if that option is enabled.
+    if [[ $INCLUDE_GIT_STATUS == true ]]; then
+        GIT_STATUS="$(cd "$WEBSITE_ROOT"; git status)"
+        EMAIL_MSG+="Here are the file-level changes, as reported by Git:\n\n$GIT_STATUS\n\n"
+    fi
+    EMAIL_MSG+="Thank you."
+
+    # Construct the message
+    SENDMAIL="From: $EMAIL_FROM\nTo: $EMAIL_TO\nSubject: $EMAIL_SUBJ\n$EMAIL_MSG\n.\n"
+
+    # Send the message
+    printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
 
 fi
-
-# Start constructing email message.
-EMAIL_SUBJ+="[$WEBSITE_URL] WordPress plugin count "
-if [[ $CHANGE_STATUS == true ]]; then
-    EMAIL_SUBJ+="change detected"
-    EMAIL_MSG+="WARNING: "
-else
-    EMAIL_SUBJ+="verified"
-fi
-EMAIL_MSG+="The number of WordPress plugins on $WEBSITE_URL has "
-if [[ $CHANGE_STATUS == false ]]; then
-    EMAIL_MSG+="not "
-fi
-EMAIL_MSG+="changed since our last check:\n\n"
-
-# Include last two lines from the log.
-EMAIL_MSG+="$(tail -n 2 "$LOG_FILE")\n\n"
-
-# Include git status, if that option is enabled.
-if [[ $INCLUDE_GIT_STATUS == true ]]; then
-    GIT_STATUS="$(cd "$WEBSITE_ROOT"; git status)"
-    EMAIL_MSG+="Here are the file-level changes, as reported by Git:\n\n$GIT_STATUS\n\n"
-fi
-
-EMAIL_MSG+="Thank you."
-
-# Construct the message
-SENDMAIL="From: $EMAIL_FROM\nTo: $EMAIL_TO\nSubject: $EMAIL_SUBJ\n$EMAIL_MSG\n.\n"
-
-# Send the message
-printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
 
 exit $?
