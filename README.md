@@ -27,7 +27,6 @@ The first time the script runs, you'll get a notification that the plugin count 
 
 #### To Do / Known Issues
 
-- Would be nice to be able to turn off alerts if the count remains unchanged.
 - Learn a better way to echo linefeeds.
 - Ability to check multiple WP sites on the same host.
 - Ability to include multiple recipients.
