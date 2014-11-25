@@ -47,6 +47,8 @@ EMAIL_FROM="$(echo $(whoami)@$(hostname))"
 # Set to true if you'd like to receive an email regardless of the plugin count.
 SEND_ALERTS_WHEN_COUNT_UNCHANGED=false
 
+# Set to true if you want the script to echo the email instead of actually sending it.
+DEBUG_MODE=false
 
 ######################### DO NOT EDIT BELOW THIS LINE ##########################
 
@@ -76,7 +78,7 @@ if [[ $HAS_COUNT_CHANGED == true ]]; then
 
         SMS_MESSAGE="Plugin alert for $WEBSITE_URL. Details sent to $EMAIL_TO.\n.\n"
         printf "$SMS_MESSAGE" | /usr/sbin/sendmail "$SMS_RECIPIENT"
-        
+
     fi
 
     EMAIL_SUBJ="[$WEBSITE_URL] WordPress plugin count change detected"
@@ -93,8 +95,13 @@ if [[ $HAS_COUNT_CHANGED == true ]]; then
     # Construct the message
     SENDMAIL="From: $EMAIL_FROM\nTo: $EMAIL_TO\nSubject: $EMAIL_SUBJ\n$EMAIL_MSG\n.\n"
 
-    # Send the message
-    printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
+    if [[ $DEBUG_MODE == true ]]; then
+        # Print the message
+        printf "$SENDMAIL"
+    else
+        # Send the message
+        printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
+    fi
 
 elif [[ $SEND_ALERTS_WHEN_COUNT_UNCHANGED == true ]]; then
 
@@ -112,8 +119,13 @@ elif [[ $SEND_ALERTS_WHEN_COUNT_UNCHANGED == true ]]; then
     # Construct the message
     SENDMAIL="From: $EMAIL_FROM\nTo: $EMAIL_TO\nSubject: $EMAIL_SUBJ\n$EMAIL_MSG\n.\n"
 
-    # Send the message
-    printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
+    if [[ $DEBUG_MODE == true ]]; then
+        # Print the message
+        printf "$SENDMAIL"
+    else
+        # Send the message
+        printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
+    fi
 
 fi
 
