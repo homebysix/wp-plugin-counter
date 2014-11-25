@@ -53,54 +53,50 @@ if [[ "$LAST_PLUGIN_COUNT" != "$CURRENT_PLUGIN_COUNT" ]]; then
 
     CHANGE_STATUS=true
 
-    EMAIL_SUBJ+="[$WEBSITE_URL] WordPress plugin count change detected"
-    EMAIL_MSG+="WARNING: The number of WordPress plugins on $WEBSITE_URL has changed since our last check:
-
-"
-
     if [[ $SEND_SMS_ALERT_ON_CHANGE == true ]]; then
-        SMS_MESSAGE="Plugin alert for $WEBSITE_URL. Details sent to $EMAIL_TO.
-.
-"
-        echo "$SMS_MESSAGE" | /usr/sbin/sendmail "$SMS_RECIPIENT"
+
+        # Only send SMS if a change has been detected, and if the SMS setting above is true
+        SMS_MESSAGE="Plugin alert for $WEBSITE_URL. Details sent to $EMAIL_TO.\n.\n"
+        printf "$SMS_MESSAGE" | /usr/sbin/sendmail "$SMS_RECIPIENT"
+
     fi
 
-else
+elif [[ $SEND_ALERTS_WHEN_COUNT_UNCHANGED == false ]]; then
 
-    EMAIL_SUBJ+="[$WEBSITE_URL] WordPress plugin count verified"
-    EMAIL_MSG+="Just a quick note to let you know that the number of WordPress plugins on $WEBSITE_URL has not changed since our last check:
-
-"
+    # If alerts are not needed, we can stop here.
+    exit 0
 
 fi
 
-# Include last two lines from the log.
-EMAIL_MSG+="$(tail -n 2 "$LOG_FILE")
+# Start constructing email message.
+EMAIL_SUBJ+="[$WEBSITE_URL] WordPress plugin count "
+if [[ $CHANGE_STATUS == true ]]; then
+    EMAIL_SUBJ+="change detected"
+    EMAIL_MSG+="WARNING: "
+else
+    EMAIL_SUBJ+="verified"
+fi
+EMAIL_MSG+="The number of WordPress plugins on $WEBSITE_URL has "
+if [[ $CHANGE_STATUS == false ]]; then
+    EMAIL_MSG+="not "
+fi
+EMAIL_MSG+="changed since our last check:\n\n"
 
-"
+# Include last two lines from the log.
+EMAIL_MSG+="$(tail -n 2 "$LOG_FILE")\n\n"
+
 # Include git status, if that option is enabled.
 if [[ $INCLUDE_GIT_STATUS == true ]]; then
     GIT_STATUS="$(cd "$WEBSITE_ROOT"; git status)"
-    EMAIL_MSG+="Here are more detailed change modifications, as reported by Git:
-
-$GIT_STATUS
-
-"
+    EMAIL_MSG+="Here are the file-level changes, as reported by Git:\n\n$GIT_STATUS\n\n"
 fi
 
 EMAIL_MSG+="Thank you."
 
 # Construct the message
-SENDMAIL="From: $EMAIL_FROM
-To: $EMAIL_TO
-Subject: $EMAIL_SUBJ
-$EMAIL_MSG
-.
-"
+SENDMAIL="From: $EMAIL_FROM\nTo: $EMAIL_TO\nSubject: $EMAIL_SUBJ\n$EMAIL_MSG\n.\n"
 
-if [[ $CHANGE_STATUS == true || $SEND_ALERTS_WHEN_COUNT_UNCHANGED == true ]]; then
-    # Send the message
-    echo "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
-fi
+# Send the message
+printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
 
 exit $?
