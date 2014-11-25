@@ -25,6 +25,7 @@ LOG_FILE="/home3/pretendco/wp_plugin_counter.log"
 
 INCLUDE_GIT_STATUS=false
 SEND_SMS_ALERT_ON_CHANGE=false
+SEND_ALERTS_WHEN_COUNT_UNCHANGED=false
 
 EMAIL_TO="you@pretendco.com"
 SMS_RECIPIENT="0005551212@txt.att.net"
@@ -40,6 +41,7 @@ LAST_CHECK_DATE="$(tail -n 1 "$LOG_FILE" | awk -F' : ' {'print $1'})"
 CURRENT_PLUGIN_COUNT="$(ls -l /"$WEBSITE_ROOT/$PLUGIN_DIR/" | grep -v " ./" | grep -v " ../" | grep -v "total " | grep -v " index.php" | wc -l)"
 CURRENT_CHECK_DATE="$(date)"
 
+CHANGE_STATUS=false
 EMAIL_SUBJ=""
 EMAIL_MSG=""
 
@@ -48,6 +50,8 @@ echo "$CURRENT_CHECK_DATE : $CURRENT_PLUGIN_COUNT plugins." >> $LOG_FILE
 
 # Compare last count to current count, and set email message accordingly.
 if [[ "$LAST_PLUGIN_COUNT" != "$CURRENT_PLUGIN_COUNT" ]]; then
+
+    CHANGE_STATUS=true
 
     EMAIL_SUBJ+="[$WEBSITE_URL] WordPress plugin count change detected"
     EMAIL_MSG+="WARNING: The number of WordPress plugins on $WEBSITE_URL has changed since our last check:
@@ -93,7 +97,10 @@ Subject: $EMAIL_SUBJ
 $EMAIL_MSG
 .
 "
-# Send the message
-echo "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
+
+if [[ $CHANGE_STATUS == true || $SEND_ALERTS_WHEN_COUNT_UNCHANGED == true ]]; then
+    # Send the message
+    echo "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
+fi
 
 exit $?
