@@ -27,7 +27,5 @@ The first time the script runs, you'll get a notification that the plugin count 
 
 #### To Do / Known Issues
 
-- Ability to check multiple WP sites on the same host.
-- Ability to include multiple recipients.
 - Better first run behavior.
 - Does not detect CHANGED plugins; only detects ADDED or REMOVED plugins.
