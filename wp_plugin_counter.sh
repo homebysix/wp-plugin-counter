@@ -115,23 +115,30 @@ if [[ ${#WEBSITE_URL[@]} == ${#WEBSITE_ROOT[@]} &&
 
             EMAIL_SUBJ="[${WEBSITE_URL[$i]}] WordPress plugin count change detected"
             EMAIL_MSG="WARNING: The number of WordPress plugins on ${WEBSITE_URL[$i]} has changed since our last check:\n\n"
+
             # Include last two lines from the log.
             EMAIL_MSG+="$(tail -n 2 "${LOG_FILE[$i]}")\n\n"
+
             # Include git status, if that option is enabled.
             if [[ $INCLUDE_GIT_STATUS == true ]]; then
                 GIT_STATUS="$(cd "${WEBSITE_ROOT[$i]}"; git status)"
-                EMAIL_MSG+="Here are the file-level changes, as reported by Git:\n\n$GIT_STATUS\n\n"
+                if [[ $? == 0 ]]; then
+                    EMAIL_MSG+="Here are the file-level changes, as reported by Git:\n\n$GIT_STATUS\n\n"
+                else
+                    EMAIL_MSG+="(An error occurred while trying to check Git status.)\n\n"
+                fi
             fi
+
             EMAIL_MSG+="Thank you."
 
-            # Construct the message
+            # Construct the message.
             SENDMAIL="From: $EMAIL_FROM\nTo: $EMAIL_TO\nSubject: $EMAIL_SUBJ\n$EMAIL_MSG\n.\n"
 
             if [[ $DEBUG_MODE == true ]]; then
-                # Print the message
+                # Print the message, if in debug mode.
                 printf "$SENDMAIL"
             else
-                # Send the message
+                # Send the message.
                 printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
             fi
 
@@ -139,23 +146,30 @@ if [[ ${#WEBSITE_URL[@]} == ${#WEBSITE_ROOT[@]} &&
 
             EMAIL_SUBJ="[${WEBSITE_URL[$i]}] WordPress plugin count verified"
             EMAIL_MSG="WARNING: The number of WordPress plugins on ${WEBSITE_URL[$i]} has not changed since our last check:\n\n"
+
             # Include last line from the log.
             EMAIL_MSG+="$(tail -n 1 "${LOG_FILE[$i]}")\n\n"
+
             # Include git status, if that option is enabled.
             if [[ $INCLUDE_GIT_STATUS == true ]]; then
                 GIT_STATUS="$(cd "${WEBSITE_ROOT[$i]}"; git status)"
-                EMAIL_MSG+="Here are the file-level changes, as reported by Git:\n\n$GIT_STATUS\n\n"
+                if [[ $? == 0 ]]; then
+                    EMAIL_MSG+="Here are the file-level changes, as reported by Git:\n\n$GIT_STATUS\n\n"
+                else
+                    EMAIL_MSG+="An error occurred while trying to check Git status:\n\n$GIT_STATUS\n\n"
+                fi
             fi
+
             EMAIL_MSG+="Thank you."
 
-            # Construct the message
+            # Construct the message.
             SENDMAIL="From: $EMAIL_FROM\nTo: $EMAIL_TO\nSubject: $EMAIL_SUBJ\n$EMAIL_MSG\n.\n"
 
             if [[ $DEBUG_MODE == true ]]; then
-                # Print the message
+                # Print the message, if in debug mode.
                 printf "$SENDMAIL"
             else
-                # Send the message
+                # Send the message.
                 printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
             fi
 
