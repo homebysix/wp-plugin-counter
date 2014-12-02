@@ -1,9 +1,10 @@
 WP Plugin Counter Changelog
 ===========================
 
-Version 1.0 - 2014-11-24
+Version 1.1.1 - pending
 
-- Initial public release, with basic plugin counting and alerting built in.
+- Added extra space between email printouts in debug mode.
+- Changelog is now in reverse chronological order, newest at top.
 
 Version 1.1 - 2014-12-02
 
@@ -14,3 +15,7 @@ Version 1.1 - 2014-12-02
 - Added debug mode that lets you see the email that will be sent.
 - Added instructions for configuring multiple email recipients.
 - Verifies website and alert settings, and fails gracefully if they are set incorrectly.
+
+Version 1.0 - 2014-11-24
+
+- Initial public release, with basic plugin counting and alerting built in.

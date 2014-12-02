@@ -10,7 +10,7 @@
 #          Author:  Elliot Jordan <elliot@elliotjordan.com>
 #         Created:  2014-11-20
 #   Last Modified:  2014-12-02
-#         Version:  1.1
+#         Version:  1.1.1-beta
 #
 ###
 
@@ -159,7 +159,7 @@ else # Website settings verified.
 
                     if [[ $DEBUG_MODE == true ]]; then
                         # Print the message, if in debug mode.
-                        printf "$SENDMAIL"
+                        printf "$SENDMAIL\n\n"
                     else
                         # Send the message.
                         printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
@@ -190,7 +190,7 @@ else # Website settings verified.
 
                     if [[ $DEBUG_MODE == true ]]; then
                         # Print the message, if in debug mode.
-                        printf "$SENDMAIL"
+                        printf "$SENDMAIL\n\n"
                     else
                         # Send the message.
                         printf "$SENDMAIL" | /usr/sbin/sendmail "$EMAIL_TO"
