@@ -16,7 +16,7 @@ This script works best when triggered hourly by cron.
 
 #### Instructions
 
-1. Edit the options in the SETTINGS section to suit your environment.
+1. Edit the options in the WEBSITE SETTINGS and ALERT SETTINGS sections to suit your environment.
 2. Place the script in your web hosting "home" folder.
 3. Add the script to your host's cron tab. If you want it to check hourly, for example, the crontab might look like this:
 ```
@@ -25,7 +25,11 @@ This script works best when triggered hourly by cron.
 
 The first time the script runs, you'll get a notification that the plugin count has changed. (This is also an excellent opportunity to test whether the SMS alerts are working, if you configured that option.)
 
-#### To Do / Known Issues
+#### To Do
 
 - Better first run behavior.
+
+#### Known Issues
+
 - Does not detect CHANGED plugins; only detects ADDED or REMOVED plugins.
+- If a fatal error occurs, no notification will be sent. Use SSH to test running the script manually before you include in cron, and you'll minimize this risk.
