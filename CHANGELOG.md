@@ -5,6 +5,7 @@ Version 1.1.1 - pending
 
 - Added extra space between email printouts in debug mode.
 - Changelog is now in reverse chronological order, newest at top.
+- Cleaned up comments in the code.
 
 Version 1.1 - 2014-12-02
 

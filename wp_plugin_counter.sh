@@ -5,8 +5,8 @@
 #            Name:  wp_plugin_counter.sh
 #     Description:  This script counts how many WordPress plugins your site has,
 #                   compares the count to the last known count, and notifies you
-#                   if the count doesn't match. This script works best when
-#                   triggered hourly by cron.
+#                   by email and/or SMS if the count doesn't match. This script
+#                   works best when triggered hourly by cron.
 #          Author:  Elliot Jordan <elliot@elliotjordan.com>
 #         Created:  2014-11-20
 #   Last Modified:  2014-12-02
@@ -16,7 +16,7 @@
 
 ############################### WEBSITE SETTINGS ###############################
 
-# The URL of your websites.
+# The URL of your website(s).
 # No https:// and no trailing slash.
 WEBSITE_URL=(
     "www.pretendco.com"
@@ -24,7 +24,7 @@ WEBSITE_URL=(
     "www.pretendco3.com"
 )
 
-# The full path to the root dir of your websites.
+# The full path to the root dir of your website(s).
 # No trailing slash.
 WEBSITE_ROOT=(
     "/home3/pretendco/public_html"
@@ -40,7 +40,7 @@ PLUGIN_DIR=(
     "wp-content/plugins"
 )
 
-# The full path to the file you'd like to save log output to.
+# The full path to the file(s) you'd like to save log output to.
 # I recommend NOT saving this log file inside your WEBSITE_ROOT dir.
 LOG_FILE=(
     "/home3/pretendco/wp_plugin_counter.log"
@@ -69,7 +69,8 @@ EMAIL_FROM="$(echo $(whoami)@$(hostname))"
 # Set to true if you'd like to receive an email regardless of the plugin count.
 SEND_ALERTS_WHEN_COUNT_UNCHANGED=false
 
-# Set to true if you want the script to echo the email instead of actually sending it.
+# Set to true if you want the script to display the email in standard output
+# instead of actually sending it.
 DEBUG_MODE=false
 
 
@@ -90,7 +91,7 @@ else # Website settings verified.
     # Let's make sure we aren't using default email alert settings.
     if [[ $EMAIL_TO == "you@pretendco.com, somebodyelse@pretendco.com" ]]; then
 
-        echo "Error: The email alert settings are still using their default email and SMS addresses. Please edit them to suit your environment."
+        echo "Error: The email alert settings are still set to the default value. Please edit them to suit your environment."
 
     else # Email alert settings verified.
 
@@ -98,7 +99,7 @@ else # Website settings verified.
         if [[ $SEND_SMS_ALERT_ON_CHANGE == true &&
               $SMS_RECIPIENT == "0005551212@txt.att.net" ]]; then
 
-            echo "Error: The SMS alert settings are still using their default email and SMS addresses. Please edit them to suit your environment."
+            echo "Error: The SMS alert settings are still set to the default value. Please edit them to suit your environment."
 
         else # SMS alert settings verified.
 
