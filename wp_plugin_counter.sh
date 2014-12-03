@@ -20,20 +20,20 @@
 # No https:// and no trailing slash.
 WEBSITE_URL=(
     "www.pretendco.com"
-    "www.pretendco2.com"
-    "www.pretendco3.com"
+    "www.pretendco.com/blog"
+    "shop.pretendco.com"
 )
 
 # The full path to the root dir of your website(s).
 # No trailing slash.
 WEBSITE_ROOT=(
     "/home3/pretendco/public_html"
-    "/home3/pretendco2/public_html"
-    "/home3/pretendco3/public_html"
+    "/home3/pretendco/public_html/blog"
+    "/home3/pretendco/subdomains/shop"
 )
 
 # The relative paths from WEBSITE_ROOT to your WP plugins dir.
-# No leading or trailing slash.
+# This is "wp-content/plugins" by default. No leading or trailing slash.
 PLUGIN_DIR=(
     "wp-content/plugins"
     "wp-content/plugins"
@@ -42,10 +42,11 @@ PLUGIN_DIR=(
 
 # The full path to the file(s) you'd like to save log output to.
 # I recommend NOT saving this log file inside your WEBSITE_ROOT dir.
+# You can use the same log for multiple sites.
 LOG_FILE=(
     "/home3/pretendco/wp_plugin_counter.log"
-    "/home3/pretendco2/wp_plugin_counter.log"
-    "/home3/pretendco3/wp_plugin_counter.log"
+    "/home3/pretendco/wp_plugin_counter.log"
+    "/home3/pretendco/wp_plugin_counter.log"
 )
 
 ################################ ALERT SETTINGS ################################
