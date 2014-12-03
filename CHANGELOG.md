@@ -3,6 +3,8 @@ WP Plugin Counter Changelog
 
 Version 1.1.1 - pending
 
+- Added the ability to use the same log file for multiple sites.
+- Script now does not send alerts on first run.
 - Added extra space between email printouts in debug mode.
 - Changelog is now in reverse chronological order, newest at top.
 - Cleaned up comments in the code.

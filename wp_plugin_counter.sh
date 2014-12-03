@@ -110,8 +110,8 @@ else # Website settings verified.
             for (( i = 0; i < $SITE_COUNT; i++ )); do
 
                 # Get last plugin count and timestamp.
-                LAST_PLUGIN_COUNT="$(tail -n 1 "${LOG_FILE[$i]}" | awk -F' : | plugins.' {'print $2'})"
-                LAST_CHECK_DATE="$(tail -n 1 "${LOG_FILE[$i]}" | awk -F' : ' {'print $1'})"
+                LAST_PLUGIN_COUNT="$(grep " : ${WEBSITE_URL[$i]} : " "${LOG_FILE[$i]}" | tail -n 1 | awk -F ' : | plugins' {'print $3'})"
+                LAST_CHECK_DATE="$(grep " : ${WEBSITE_URL[$i]} : " "${LOG_FILE[$i]}" | tail -n 1 | awk -F ' : ' {'print $1'})"
 
                 # Get current plugin count and timestamp.
                 # This count excludes the following items from the `ls -l` output:
@@ -128,8 +128,13 @@ else # Website settings verified.
                     HAS_COUNT_CHANGED=false
                 fi
 
+                # If no previous log exists for this site (e.g. on first run) then do not send alerts.
+                if [[ $(grep " : ${WEBSITE_URL[$i]} : " "${LOG_FILE[$i]}" | wc -l) == 0 ]]; then
+                    HAS_COUNT_CHANGED=false
+                fi
+
                 # Write a new count and timestamp to the logs.
-                echo "$CURRENT_CHECK_DATE : $CURRENT_PLUGIN_COUNT plugins." >> ${LOG_FILE[$i]}
+                echo "$CURRENT_CHECK_DATE : ${WEBSITE_URL[$i]} : $CURRENT_PLUGIN_COUNT plugins" >> ${LOG_FILE[$i]}
 
                 # If the count has changed, send an email.
                 if [[ $HAS_COUNT_CHANGED == true ]]; then
@@ -145,7 +150,7 @@ else # Website settings verified.
                     EMAIL_MSG="WARNING: The number of WordPress plugins on ${WEBSITE_URL[$i]} has changed since our last check:\n\n"
 
                     # Include last two lines from the log.
-                    EMAIL_MSG+="$(tail -n 2 "${LOG_FILE[$i]}")\n\n"
+                    EMAIL_MSG+="$(grep " : ${WEBSITE_URL[$i]} : " "${LOG_FILE[$i]}" | tail -n 2)\n\n"
 
                     # Include git status, if that option is enabled.
                     if [[ $INCLUDE_GIT_STATUS == true ]]; then
@@ -176,7 +181,7 @@ else # Website settings verified.
                     EMAIL_MSG="WARNING: The number of WordPress plugins on ${WEBSITE_URL[$i]} has not changed since our last check:\n\n"
 
                     # Include last line from the log.
-                    EMAIL_MSG+="$(tail -n 1 "${LOG_FILE[$i]}")\n\n"
+                    EMAIL_MSG+="$(grep " : ${WEBSITE_URL[$i]} : " "${LOG_FILE[$i]}" | tail -n 1)\n\n"
 
                     # Include git status, if that option is enabled.
                     if [[ $INCLUDE_GIT_STATUS == true ]]; then
