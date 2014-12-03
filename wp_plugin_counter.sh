@@ -114,7 +114,11 @@ else # Website settings verified.
                 LAST_CHECK_DATE="$(tail -n 1 "${LOG_FILE[$i]}" | awk -F' : ' {'print $1'})"
 
                 # Get current plugin count and timestamp.
-                CURRENT_PLUGIN_COUNT="$(ls -l /"${WEBSITE_ROOT[$i]}/${PLUGIN_DIR[$i]}/" | grep -v " ./" | grep -v " ../" | grep -v "total " | grep -v " index.php" | wc -l)"
+                # This count excludes the following items from the `ls -l` output:
+                #   The line which gives the total size of the directory.
+                #   The lines ./ and ../ which link to the current directory and its parent.
+                #   Any files called index.php. ("Silence is golden.")
+                CURRENT_PLUGIN_COUNT="$(ls -l /"${WEBSITE_ROOT[$i]}/${PLUGIN_DIR[$i]}/" | grep -v " ./$" | grep -v " ../$" | grep -v "^total " | grep -v " index.php$" | wc -l)"
                 CURRENT_CHECK_DATE="$(date)"
 
                 # Compare current count to last count and return result.
