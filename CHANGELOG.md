@@ -8,6 +8,9 @@ Version 1.1.1 - pending
 - Added extra space between email printouts in debug mode.
 - Changelog is now in reverse chronological order, newest at top.
 - Cleaned up comments in the code.
+- Changed WEBSITE_URL to WEBSITE_NAME to make clear that it doesn't have to be a URL.
+- Added exits with error codes if settings validation fails.
+- Added sendmail path validation.
 
 Version 1.1 - 2014-12-02
 
