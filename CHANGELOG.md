@@ -1,7 +1,7 @@
 WP Plugin Counter Changelog
 ===========================
 
-Version 1.1.1 - pending
+Version 1.1.1 - 2014-12-04
 
 - Added the ability to use the same log file for multiple sites.
 - Script now does not send alerts on first run.
