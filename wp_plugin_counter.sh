@@ -10,7 +10,7 @@
 #          Author:  Elliot Jordan <elliot@elliotjordan.com>
 #         Created:  2014-11-20
 #   Last Modified:  2014-12-04
-#         Version:  1.1.1
+#         Version:  1.1.2
 #
 ###
 
@@ -143,11 +143,9 @@ for (( i = 0; i < $SITE_COUNT; i++ )); do
     LAST_CHECK_DATE="$(grep " : ${WEBSITE_NAME[$i]} : " "${LOG_FILE[$i]}" | tail -n 1 | awk -F ' : ' {'print $1'})"
 
     # Get current plugin count and timestamp.
-    # This count excludes the following items from the `ls -l` output:
-    #   The line which gives the total size of the directory.
-    #   The lines ./ and ../ which link to the current directory and its parent.
-    #   Any files called index.php. ("Silence is golden.")
-    CURRENT_PLUGIN_COUNT="$(ls -l /"${WEBSITE_ROOT[$i]}/${PLUGIN_DIR[$i]}/" | grep -v " ./$" | grep -v " ../$" | grep -v "^total " | grep -v " index.php$" | wc -l)"
+    CURRENT_PLUGIN_COUNT="$(find /"${WEBSITE_ROOT[$i]}/${PLUGIN_DIR[$i]}" -maxdepth 1 | grep -v "/index.php$" | wc -l)"
+    # Subtract one to account for inclusion of the plugin folder itself in the `find` output.
+    (( CURRENT_PLUGIN_COUNT -= 1 ))
     CURRENT_CHECK_DATE="$(date)"
 
     # Compare current count to last count and return result.
@@ -171,7 +169,14 @@ for (( i = 0; i < $SITE_COUNT; i++ )); do
         if [[ $SEND_SMS_ALERT_ON_CHANGE == true && $SMS_RECIPIENT != "0005551212@txt.att.net" ]]; then
 
             SMS_MESSAGE="Plugin alert for ${WEBSITE_NAME[$i]}. Details sent to $EMAIL_TO.\n.\n"
-            printf "$SMS_MESSAGE" | $sendmail "$SMS_RECIPIENT"
+
+            if [[ $DEBUG_MODE == true ]]; then
+                # Print the SMS, if in debug mode.
+                printf "$SMS_MESSAGE\n\n"
+            elif [[ $DEBUG_MODE == false ]]; then
+                # Send the SMS.
+                printf "$SMS_MESSAGE" | /usr/sbin/sendmail "$SMS_RECIPIENT"
+            fi
 
         fi
 
@@ -230,7 +235,7 @@ for (( i = 0; i < $SITE_COUNT; i++ )); do
         if [[ $DEBUG_MODE == true ]]; then
             # Print the message, if in debug mode.
             printf "$THE_EMAIL\n\n"
-        else
+        elif [[ $DEBUG_MODE == false ]]; then
             # Send the message.
             printf "$THE_EMAIL" | $sendmail "$EMAIL_TO"
         fi
