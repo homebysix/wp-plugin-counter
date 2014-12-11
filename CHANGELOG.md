@@ -1,6 +1,11 @@
 WP Plugin Counter Changelog
 ===========================
 
+Version 1.1.2 - 2012-12-11
+
+- Now only prints SMS instead of sending it, if debug mode is on.
+- Using `find` instead of `ls` to get current plugin count. Should be faster for sites with large numbers of plugins.
+
 Version 1.1.1 - 2014-12-04
 
 - Added the ability to use the same log file for multiple sites.
