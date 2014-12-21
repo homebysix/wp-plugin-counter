@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ###
 #
@@ -10,7 +10,7 @@
 #          Author:  Elliot Jordan <elliot@elliotjordan.com>
 #         Created:  2014-11-20
 #   Last Modified:  2014-12-04
-#         Version:  1.1.2
+#         Version:  1.1.3-beta
 #
 ###
 
@@ -65,7 +65,7 @@ SMS_RECIPIENT="0005551212@txt.att.net"
 EMAIL_TO="you@pretendco.com, somebodyelse@pretendco.com"
 
 # The email notifications will be sent from this email address.
-EMAIL_FROM="$(echo $(whoami)@$(hostname))"
+EMAIL_FROM="$(whoami)@$(hostname)"
 
 # Set to true if you'd like to receive an email regardless of the plugin count.
 SEND_ALERTS_WHEN_COUNT_UNCHANGED=false
@@ -84,6 +84,8 @@ DEBUG_MODE=false
 
 
 ######################## VALIDATION AND ERROR CHECKING #########################
+
+APPNAME=$(basename "$0" | sed "s/\.sh$//")
 
 # Let's make sure we have the same number of website settings.
 if [[ ${#WEBSITE_NAME[@]} != ${#WEBSITE_ROOT[@]} ||
@@ -122,7 +124,7 @@ if [[ ! -x $sendmail ]]; then
         echo "Error: Unable to locate the path to sendmail." >&2
         exit 1004
     else
-        echo "Located sendmail at $sendmail_try2. Please adjust the \"$(basename $0)\" script settings accordingly." >&2
+        echo "Located sendmail at $sendmail_try2. Please adjust the $APPNAME script settings accordingly." >&2
         sendmail="$sendmail_try2"
         # Fatal error avoided. No exit needed.
     fi
@@ -136,14 +138,14 @@ fi # End sendmail validation.
 SITE_COUNT=${#WEBSITE_NAME[@]}
 
 # Begin iterating through websites.
-for (( i = 0; i < $SITE_COUNT; i++ )); do
+for (( i = 0; i < SITE_COUNT; i++ )); do
 
     # Get last plugin count and timestamp.
     LAST_PLUGIN_COUNT="$(grep " : ${WEBSITE_NAME[$i]} : " "${LOG_FILE[$i]}" | tail -n 1 | awk -F ' : | plugins' {'print $3'})"
     LAST_CHECK_DATE="$(grep " : ${WEBSITE_NAME[$i]} : " "${LOG_FILE[$i]}" | tail -n 1 | awk -F ' : ' {'print $1'})"
 
     # Get current plugin count and timestamp.
-    CURRENT_PLUGIN_COUNT="$(find /"${WEBSITE_ROOT[$i]}/${PLUGIN_DIR[$i]}" -maxdepth 1 | grep -v "/index.php$" | wc -l)"
+    CURRENT_PLUGIN_COUNT="$(find /"${WEBSITE_ROOT[$i]}/${PLUGIN_DIR[$i]}" -maxdepth 1 | grep -c -v "/index.php$")"
     # Subtract one to account for inclusion of the plugin folder itself in the `find` output.
     (( CURRENT_PLUGIN_COUNT -= 1 ))
     CURRENT_CHECK_DATE="$(date)"
@@ -172,10 +174,10 @@ for (( i = 0; i < $SITE_COUNT; i++ )); do
 
             if [[ $DEBUG_MODE == true ]]; then
                 # Print the SMS, if in debug mode.
-                printf "$SMS_MESSAGE\n\n"
+                printf "%s\n\n" "$SMS_MESSAGE"
             elif [[ $DEBUG_MODE == false ]]; then
                 # Send the SMS.
-                printf "$SMS_MESSAGE" | /usr/sbin/sendmail "$SMS_RECIPIENT"
+                printf "%s" "$SMS_MESSAGE" | $sendmail "$SMS_RECIPIENT"
             fi
 
         fi
@@ -203,10 +205,10 @@ for (( i = 0; i < $SITE_COUNT; i++ )); do
 
         if [[ $DEBUG_MODE == true ]]; then
             # Print the message, if in debug mode.
-            printf "$THE_EMAIL\n\n"
+            printf "%s\n\n" "$THE_EMAIL"
         else
             # Send the message.
-            printf "$THE_EMAIL" | $sendmail "$EMAIL_TO"
+            printf "%s" "$THE_EMAIL" | $sendmail "$EMAIL_TO"
         fi
 
     elif [[ $SEND_ALERTS_WHEN_COUNT_UNCHANGED == true ]]; then
@@ -229,15 +231,15 @@ for (( i = 0; i < $SITE_COUNT; i++ )); do
 
         EMAIL_MSG+="Thank you."
 
-        # Construct the message.
+        # Assemble the message.
         THE_EMAIL="From: $EMAIL_FROM\nTo: $EMAIL_TO\nSubject: $EMAIL_SUBJ\n$EMAIL_MSG\n.\n"
 
         if [[ $DEBUG_MODE == true ]]; then
             # Print the message, if in debug mode.
-            printf "$THE_EMAIL\n\n"
+            printf "%s\n\n" "$THE_EMAIL"
         elif [[ $DEBUG_MODE == false ]]; then
             # Send the message.
-            printf "$THE_EMAIL" | $sendmail "$EMAIL_TO"
+            printf "%s" "$THE_EMAIL" | $sendmail "$EMAIL_TO"
         fi
 
     fi
