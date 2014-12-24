@@ -68,3 +68,4 @@ Once you confirm that the output is correct (especially the "To:" email address)
 - Ability to test alerts easily.
 - Ability to use switches.
 - Ability to loop endlessly.
+- `grep -c` intead of `grep x | wc -l`

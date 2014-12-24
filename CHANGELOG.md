@@ -1,6 +1,10 @@
 WP Plugin Counter Changelog
 ===========================
 
+Version 1.1.3 - pending
+
+- Minor changes based on shell script linter feedback.
+
 Version 1.1.2 - 2012-12-11
 
 - Now only prints SMS instead of sending it, if debug mode is on.
