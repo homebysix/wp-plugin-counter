@@ -1,6 +1,10 @@
 WP Plugin Counter Changelog
 ===========================
 
+Version 1.1.4 - pending
+
+- Fixed typo that resulted in bad email formatting.
+
 Version 1.1.3 - 2012-12-23
 
 - Minor changes based on shell script linter feedback.

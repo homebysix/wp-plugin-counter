@@ -9,8 +9,8 @@
 #                   works best when triggered hourly by cron.
 #          Author:  Elliot Jordan <elliot@elliotjordan.com>
 #         Created:  2014-11-20
-#   Last Modified:  2014-12-04
-#         Version:  1.1.3
+#   Last Modified:  2015-01-02
+#         Version:  1.1.4
 #
 ###
 
@@ -174,10 +174,10 @@ for (( i = 0; i < SITE_COUNT; i++ )); do
 
             if [[ $DEBUG_MODE == true ]]; then
                 # Print the SMS, if in debug mode.
-                printf "%s\n\n" "$SMS_MESSAGE"
+                printf "$SMS_MESSAGE\n\n"
             elif [[ $DEBUG_MODE == false ]]; then
                 # Send the SMS.
-                printf "%s" "$SMS_MESSAGE" | $sendmail "$SMS_RECIPIENT"
+                printf "$SMS_MESSAGE" | $sendmail "$SMS_RECIPIENT"
             fi
 
         fi
@@ -205,10 +205,10 @@ for (( i = 0; i < SITE_COUNT; i++ )); do
 
         if [[ $DEBUG_MODE == true ]]; then
             # Print the message, if in debug mode.
-            printf "%s\n\n" "$THE_EMAIL"
+            printf "$THE_EMAIL\n\n"
         else
             # Send the message.
-            printf "%s" "$THE_EMAIL" | $sendmail "$EMAIL_TO"
+            printf "$THE_EMAIL" | $sendmail "$EMAIL_TO"
         fi
 
     elif [[ $SEND_ALERTS_WHEN_COUNT_UNCHANGED == true ]]; then
@@ -239,7 +239,7 @@ for (( i = 0; i < SITE_COUNT; i++ )); do
             printf "%s\n\n" "$THE_EMAIL"
         elif [[ $DEBUG_MODE == false ]]; then
             # Send the message.
-            printf "%s" "$THE_EMAIL" | $sendmail "$EMAIL_TO"
+            printf "$THE_EMAIL" | $sendmail "$EMAIL_TO"
         fi
 
     fi
