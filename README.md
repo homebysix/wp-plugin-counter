@@ -65,7 +65,7 @@ Once you confirm that the output is correct (especially the "To:" email address)
 
 ## To Do
 
-- Ability to test alerts easily.
-- Ability to use switches.
-- Ability to loop endlessly.
-- `grep -c` intead of `grep x | wc -l`
+- [ ] Ability to test alerts easily.
+- [ ] Ability to use switches.
+- [ ] Ability to loop endlessly.
+- [ ] `grep -c` intead of `grep x | wc -l`
